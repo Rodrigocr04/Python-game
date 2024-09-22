@@ -1,185 +1,182 @@
-#Rodrigo Castellanos Rodriguez A01643147 
+# Rodrigo Castellanos Rodriguez A01643147 
 
-import turtle #modulo para crear graficos y dibujos 
-import time #modulo para trabajar con tiempo en python 
-import random #modulo para generar numeros aleatorios 
+import turtle  # module for creating graphics and drawings 
+import time     # module for working with time in Python 
+import random   # module for generating random numbers 
 
-delay = 0.1 #retraso para controlar la velocidad del juego
+delay = 0.1  # delay to control the game speed
 
-#puntajes 
-score = 0 #variable para el puntaje
-high_score = 0 #variable para el puntaje mas alto
+# Scores 
+score = 0  # variable for the score
+high_score = 0  # variable for the highest score
 
-#pantalla
-ventana = turtle.Screen() #variable para la ventana del juego, crea una instancia de la clase Screen
-ventana.title("Snake Game") #titulo de la ventana 
-ventana.bgcolor("black") #establece el color de fondo de la ventana 
-ventana.setup(width=600, height=600) #configura las dimensiones de la ventana
-ventana.tracer(0) #la ventana no se actualizara automaticamente despues de dibujar algo en ella
+# Screen 
+window = turtle.Screen()  # variable for the game window, creates an instance of the Screen class
+window.title("Snake Game")  # title of the window 
+window.bgcolor("black")  # sets the background color of the window 
+window.setup(width=600, height=600)  # configures the dimensions of the window
+window.tracer(0)  # the window will not update automatically after drawing something
 
-#cabeza de la serpiente
-head = turtle.Turtle() #variable para la cabeza, crea una instancia de la clase Turtle
-head.speed(0) #evita que la tortuga se mueva automaticamente cuando se crea
-head.shape("square") #forma de la cabeza
-head.color("purple") #color de la cabeza
-head.penup() #evita que la serpiente deje un trazo al moverse
-head.goto(0,0) #posicion de inicio de la cabeza
-head.direction = "stop" #hace que la cabeza inicie en reposo 
+# Snake head 
+head = turtle.Turtle()  # variable for the head, creates an instance of the Turtle class
+head.speed(0)  # prevents the turtle from moving automatically when created
+head.shape("square")  # shape of the head
+head.color("purple")  # color of the head
+head.penup()  # prevents the snake from leaving a trail while moving
+head.goto(0, 0)  # starting position of the head
+head.direction = "stop"  # sets the initial direction to stop 
 
-#comida de serpiente
-food = turtle.Turtle() #variable para la manzana, crea una instancia de la clase Turtle
-food.speed(0) #evita que la manzana se mueva automaticamente cuando se crea
-food.shape("circle") #forma de la manzana
-food.color("red") #color de la manzana 
-food.penup() #evita que la manzana deje un trazo al moverse 
-food.goto(-20,80) #posicion de inicio de la manzana 
+# Snake food 
+food = turtle.Turtle()  # variable for the food, creates an instance of the Turtle class
+food.speed(0)  # prevents the food from moving automatically when created
+food.shape("circle")  # shape of the food
+food.color("red")  # color of the food 
+food.penup()  # prevents the food from leaving a trail while moving 
+food.goto(-20, 80)  # starting position of the food 
 
+segments = []  # list of additional snake segments
 
-segments = [] #lista de los segmentos adicionales de la serpiente
+# Pen 
+pen = turtle.Turtle()  # variable to display text, creates an instance of the Turtle class
+pen.speed(0)  # the turtle is only used for drawing text, no need to move 
+pen.color("pink")  # color of the text in the window
+pen.penup()  # prevents leaving a trail when moving 
+pen.hideturtle()  # hides the turtle so it's not visible, only the text is visible
+pen.goto(0, 260)  # position to display the score text
+pen.write("Score: 0  High Score: 0", align="center", font=("Arial", 25, "normal"))  # uses the write method to display the scores
 
-#Pluma
-pen = turtle.Turtle() #variable para mostrar texto, crea una instancia de la clase Turtle
-pen.speed(0) #la tortuga solo se usa para dibujar texto, no se tiene que mover 
-pen.color("pink") #color del texto de la ventana
-pen.penup() #evita dejar un trazo cuando se mueva 
-pen.hideturtle() #oculta la tortuga para que no sea visible, solo es visible el texto
-pen.goto(0, 260) #donde se va a mostrar el texto de los puntajes
-pen.write("Score: 0  High Score: 0", align="center", font=("Arial", 25, "normal")) #usa metodo write para escribir los puntajes
+# Functions for head movement 
+def go_up():  # checks if the current direction is not down, if so changes the direction to up 
+    if head.direction != "down":
+        head.direction = "up"
 
+def go_down():  # checks if the current direction is not up, if so changes the direction to down
+    if head.direction != "up":
+        head.direction = "down"
 
-#Funciones para el movimiento de la cabeza
-def go_up(): #verifica si la direccion actual no es abajo, si es asi cambia la direccion a arriba 
-	if head.direction != "down":
-		head.direction="up"
+def go_left():  # checks if the current direction is not right, if so changes the direction to left
+    if head.direction != "right":
+        head.direction = "left"
 
-def go_down(): #verifica si la direccion actual no es arriba, si es asi cambia la direccion a abajo
-	if head.direction != "up":
-		head.direction="down"
+def go_right():  # checks if the current direction is not left, if so changes the direction to right  
+    if head.direction != "left":
+        head.direction = "right"
 
-def go_left(): #verifica si la direccion actual no es derecha, si es asi cambia la direccion a izquierda
-	if head.direction != "right":
-		head.direction="left"
+def move():  # function to adjust the head's coordinates depending on the direction
+    if head.direction == "up":
+        y = head.ycor()
+        head.sety(y + 20)  # adds to the y-axis
 
-def go_right(): #verifica si la direccion actual no es izquierda, si es asi cambia la direccion a derecha  
-	if head.direction != "left":
-		head.direction="right"
+    if head.direction == "down":
+        y = head.ycor()
+        head.sety(y - 20)  # subtracts from the y-axis
 
-def move(): #funcion para ajustar las coordenadas cabeza dependiendo de la direccion
-	if head.direction == "up":
-		y = head.ycor()
-		head.sety(y+20) #suma al eje y
+    if head.direction == "left":
+        x = head.xcor()
+        head.setx(x - 20)  # subtracts from the x-axis
 
-	if head.direction == "down":
-		y = head.ycor()
-		head.sety(y-20) #resta al eje y
+    if head.direction == "right":
+        x = head.xcor()
+        head.setx(x + 20)  # adds to the x-axis
 
-	if head.direction == "left":
-		x = head.xcor()
-		head.setx(x-20) #resta al eje x
+# Keyboard bindings
+window.listen()  # makes the window respond to keyboard input
+window.onkeypress(go_up, "Up")
+window.onkeypress(go_down, "Down")
+window.onkeypress(go_left, "Left")
+window.onkeypress(go_right, "Right")
 
-	if head.direction == "right":
-		x = head.xcor()
-		head.setx(x+20) #suma al eje x
+# Main game loop
+while True:  # infinite loop to run the game until manually closed 
+    window.update()  # calls the update method on the graphic window to refresh the screen 
 
-#keyboard bindings
-ventana.listen() #hace que la ventana responda a los inputs de las teclas
-ventana.onkeypress(go_up, "Up")
-ventana.onkeypress(go_down, "Down")
-ventana.onkeypress(go_left, "Left")
-ventana.onkeypress(go_right, "Right")
+    # Check for collision of the head with the borders 
+    if head.xcor() > 290 or head.xcor() < -290 or head.ycor() > 290 or head.ycor() < -290:  # defines the screen edges 
+        time.sleep(1)  # pauses the game to indicate the crash 
+        head.goto(0, 0)  # resets the head position
+        head.direction = "stop"  # stops the head movement to rest
 
-#loop principal del juego
-while True: #bucle infinito para correr el juego hasta que se cierre manualmente 
-	ventana.update() #llama al metodo update en la ventana grafica para actualizar la pantalla 
+        # Hide the snake segments by moving them off-screen 
+        for segment in segments:
+            segment.goto(1000, 1000)
 
-	#checar para la colision de la cabeza con los bordes 
-	if head.xcor()>290 or head.xcor()<-290 or head.ycor()>290 or head.ycor()<-290: #define los bordes de la pantalla 
-		time.sleep(1) #pausa el juego para indicar el choque 
-		head.goto(0,0) #reinicia la posicion de la cabeza
-		head.direction = "stop" #detiene el movimiento de la cabeza para que este en reposo
+        # Clear the list of snake segments to reset to just the head
+        segments.clear()
 
-		#ocultar los segmentos de la serpiente moviendolos afuera de la pantalla 
-		for segment in segments:
-			segment.goto(1000, 1000)
+        # Reset score
+        score = 0
 
-		#limpiar la lista de segmentos de la serpiente para que vuelva a ser solo la cabeza
-		segments.clear()
+        # Reset delay
+        delay = 0.1
 
-		#resetear el puntaje
-		score = 0
+        pen.clear()  # clear the current score text 
+        pen.write("Score: {}  High Score: {}".format(score, high_score), align="center", font=("Arial", 20, "normal"))  # write the updated score text
 
-		#resetear el delay
-		delay = 0.1
+    # Check for collision with the food
+    if head.distance(food) < 20:  # if the head is less than 20 pixels from the food, consider it a collision
+        # Move the food to a random position within the game boundaries
+        x = random.randint(-290, 290)
+        y = random.randint(-290, 290)
+        food.goto(x, y)  # move the food to the new random position
 
-		pen.clear() #borrar el texto de la puntuacion actual 
-		pen.write("Score: {}  High Score: {}".format(score, high_score), align="center", font=("Arial", 20, "normal")) #escribe el texto actualizado del puntaje
+        # Add a segment to the snake
+        new_segment = turtle.Turtle()  # create a new segment of the snake
+        new_segment.speed(0)  # ensures the segment starts at rest
+        new_segment.shape("circle")  # defines the shape of the segment
+        new_segment.color("purple")  # defines the color of the segment
+        new_segment.penup()  # prevents it from leaving a trail when moving
+        segments.append(new_segment)  # adds the new segment to the list of segments
 
-	#checar para una colision con la manzana
-	if head.distance(food) <20: #si la cabeza esta a menos de 20 pixeles de la manzana se considera como colision
-		#mover la manzana a una posicion aleatoria dentro de los limites del juego
-		x = random.randint(-290,290)
-		y = random.randint(-290,290)
-		food.goto(x,y) #mueve la manzana a la nueva posicion aleatoria
+        # Make the delay shorter so that the snake moves faster each time it eats, making the game more challenging 
+        delay -= 0.001
 
-		#agregar un segmento de la serpiente
-		new_segment = turtle.Turtle() #se crea un nuevo segmento de la serpiente
-		new_segment.speed(0) #hace que el segmento empieze en reposo
-		new_segment.shape("circle") #define la forma del segmento
-		new_segment.color("purple") #define el color del segmento
-		new_segment.penup() #evitar que deje un trazo cuando se mueva
-		segments.append(new_segment) #agrega el nuevo segmento a la lista de segmentos
+        # Increment score
+        score += 1
 
-		#Hace el delay mas corto para que cada vez que coma la serpiente vaya mas rapido y el juego se mas dificil 
-		delay -= 0.001
+        if score > high_score:  # if the current score is greater than the high score, update the high score
+            high_score = score
 
-		#incrementa el puntaje
-		score += 1
+        pen.clear()  # clear the current score text 
+        pen.write("Score: {}  High Score: {}".format(score, high_score), align="center", font=("Arial", 20, "normal"))  # update the scores
 
-		if score > high_score: #si el puntaje actual es mayor al record, se actualiza el record
-			high_score = score
+    # Move the segments in reverse order 
+    for index in range(len(segments) - 1, 0, -1):  # iterate through segments from last to second 
+        x = segments[index - 1].xcor()
+        y = segments[index - 1].ycor()
+        segments[index].goto(x, y)  # update the current segment's coordinates to follow the previous segment
 
-		pen.clear() #borra el texto de la puntuacion actual 
-		pen.write("Score: {}  High Score: {}".format(score, high_score), align="center", font=("Arial", 20, "normal")) #actualiza los nuevos puntajes
+    # Move segment 0 to the head's position
+    if len(segments) > 0:  # moves to the snake head position to follow it
+        x = head.xcor()
+        y = head.ycor()
+        segments[0].goto(x, y)
 
-	#mover el segmento al final en orden reversivo
-	for index in range(len(segments)-1, 0, -1): #recorre los segmentos desde el ultimo hasta el segundo 
-		x = segments[index-1].xcor()
-		y = segments[index-1].ycor()
-		segments[index].goto(x, y) #las coordenadas del segmento actual se actualizan para seguir al segmento anterior
+    move()  # function that moves the snake head in the current direction
 
-	#mover segmento 0 a donde esta la cabeza
-	if len(segments) > 0: #se mueve a la posicion de la cabeza de la serpiente para seguir a la cabeza
-		x = head.xcor()
-		y = head.ycor()
-		segments[0].goto(x, y)
+    # Check for collision of the head with the segments
+    for segment in segments:
+        if segment.distance(head) < 20:  # if the distance from the head to a segment is less than 20 pixels, consider it a collision
+            time.sleep(1)  # pause the game for a second to visualize the crash 
+            head.goto(0, 0)  # reset the head position 
+            head.direction = "stop"  # stop the head to rest
 
-	move() #funcion que mueve la cabeza de la serpiente en la direccion actual
+            # Hide the segments
+            for segment in segments:
+                segment.goto(1000, 1000)
 
-	#checar colision de la cabeza con los segmentos
-	for segment in segments:
-		if segment.distance(head) < 20: #si la distancia de la cabeza a un segmento es menor a 20 pixeles se considera como colision
-			time.sleep(1) #se pausa el juego un segundo para visualizar el choque 
-			head.goto(0,0) #se reinicia la posicion de la cabeza 
-			head.direction = "stop" #se detiene la cabeza para que este en reposo
+            # Clear the list of segments
+            segments.clear()
 
-			#ocultar los segmentos
-			for segment in segments:
-				segment.goto(1000, 1000)
+            # Reset score
+            score = 0
 
-		#limpiar la lista de segmentos
-			segments.clear()
+            # Reset the delay to reset game speed
+            delay = 0.1
 
-			#resetear el puntaje
-			score = 0
+            # Update scores 
+            pen.clear()
+            pen.write("Score: {}  High Score: {}".format(score, high_score), align="center", font=("Arial", 20, "normal"))
 
-			#resetear el delay para resetear la velocidad del juego
-			delay = 0.1
+    time.sleep(delay)  # the main loop waits a determined amount of time before continuing 
 
-		#actualizar los puntajes 
-			pen.clear()
-			pen.write("Score: {}  High Score: {}".format(score, high_score), align="center", font=("Arial", 20, "normal"))
-
-	time.sleep(delay) #el bucle principal espera un tiempo determinado antes de continuar 
-
-
-ventana.mainloop() #inicia el bucle principal del juego y mantiene la ventana del juego abierta hasta que se cierre manualmente
+window.mainloop()  # starts the main game loop and keeps the game window open until manually closed
